@@ -11,6 +11,7 @@ export const Filter = () => {
       type="text"
       placeholder="Search..."
       onChange={evt => dispatch(filterContacts(evt.target.value))}
+      title="Search by name or phone number"
     />
   );
 };

@@ -108,8 +108,8 @@ export const Modal = () => {
               defaultValue={modalData.number}
               placeholder="Enter new number"
               required
-              pattern="^[\d+\s\-*#]{5,12}$"
-              title="Phone number can contain digits, spaces, hyphens, or symbols like *, #, etc. Length: 5-12 characters."
+              pattern="^[\d+\s\-*#]{5,18}$"
+              title="Phone number can contain digits, spaces, hyphens, or symbols like *, #, etc. Length: 5-18 characters."
             />
 
             <button

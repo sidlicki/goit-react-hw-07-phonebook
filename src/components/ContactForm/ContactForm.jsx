@@ -74,8 +74,8 @@ export const ContactForm = () => {
         name="number"
         placeholder="Enter number"
         required
-        pattern="^[\d+\s\-*#]{5,12}$"
-        title="Phone number can contain digits, spaces, hyphens, or symbols like *, #, etc. Length: 5-12 characters."
+        pattern="^[\d+\s\-*#]{5,18}$"
+        title="Phone number can contain digits, spaces, hyphens, or symbols like *, #, etc. Length: 5-18 characters."
       />
       <label className={css.labelCheckbox} title={`Add to favorite`}>
         <input
