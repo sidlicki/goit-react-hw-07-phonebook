@@ -1,20 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import css from './ContactList.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addToFavorite,
   deleteContact,
-  fetchAllContacts,
   removeFromFavorite,
 } from 'redux/contacts/contacts.reducer';
 import { Notify } from 'notiflix';
 
 export const ContactList = () => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchAllContacts());
-  }, [dispatch]);
 
   const contacts = useSelector(state => state.contacts.contacts.items);
 

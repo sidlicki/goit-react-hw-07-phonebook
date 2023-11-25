@@ -1,12 +1,19 @@
 import Layout from './Layout/Layout';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { fetchAllContacts } from 'redux/contacts/contacts.reducer';
 
 const HomePage = lazy(() => import('pages/HomePage'));
 const ContactsPage = lazy(() => import('pages/ContactsPage'));
 const Favorites = lazy(() => import('pages/FavoriteContactsPage'));
 
 export const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllContacts());
+  }, [dispatch]);
   return (
     <Layout>
       <Suspense fallback={<div>Loading...</div>}>
