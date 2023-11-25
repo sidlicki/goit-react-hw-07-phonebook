@@ -10,12 +10,18 @@ import { Notify } from 'notiflix';
 export const FavoriteList = () => {
   const dispatch = useDispatch();
 
-  const filter = useSelector(state => state.contactsStore.filter);
+  const contacts = useSelector(state => state.contacts.contacts.items);
 
-  const favorites = useSelector(state => state.contactsStore.favoriteContacts);
+  const filter = useSelector(state => state.contacts.filter);
 
-  const filteredContacts = favorites.filter(contact =>
+  const favoriteContacts = contacts.filter(contact => contact.favorite);
+
+  const filteredContacts = favoriteContacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const filteredAndSortedContacts = [...filteredContacts].sort((a, b) =>
+    a.name.localeCompare(b.name)
   );
 
   const handleDeleteContact = (name, id) => {
@@ -31,8 +37,8 @@ export const FavoriteList = () => {
 
   return (
     <ul className={css.list}>
-      {filteredContacts.length > 0 ? (
-        filteredContacts.map(contact => (
+      {filteredAndSortedContacts.length > 0 ? (
+        filteredAndSortedContacts.map(contact => (
           <li key={contact.id} className={css.item}>
             <button
               className={css.button}
@@ -58,7 +64,7 @@ export const FavoriteList = () => {
           </li>
         ))
       ) : (
-        <h3 className={css.subtitle}>No favorite contacts.</h3>
+        <h3 className={css.subtitle}>No favorites contacts found.</h3>
       )}
     </ul>
   );

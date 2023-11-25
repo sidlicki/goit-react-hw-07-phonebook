@@ -31,16 +31,47 @@ export const addContact = createAsyncThunk(
   }
 );
 
-export const removeContact = createAsyncThunk(
-  'contacts/removeContact',
-  async (id, thunkApi) => {
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact ',
+  async (contactId, thunkApi) => {
     try {
       const { data } = await axios.delete(
-        `https://6560d78d83aba11d99d199f6.mockapi.io/contacts/allContacts/${id}`
+        `https://6560d78d83aba11d99d199f6.mockapi.io/contacts/allContacts/${contactId}`
+      );
+
+      return data;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const addToFavorite = createAsyncThunk(
+  'contacts/addToFavorite',
+  async (contactId, thunkApi) => {
+    try {
+      const { data } = await axios.put(
+        `https://6560d78d83aba11d99d199f6.mockapi.io/contacts/allContacts/${contactId}`,
+        { favorite: true }
       );
       return data;
-    } catch (err) {
-      return thunkApi.rejectWithValue(err.message);
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const removeFromFavorite = createAsyncThunk(
+  'contacts/removeFromFavorite',
+  async (contactId, thunkApi) => {
+    try {
+      const { data } = await axios.put(
+        `https://6560d78d83aba11d99d199f6.mockapi.io/contacts/allContacts/${contactId}`,
+        { favorite: false }
+      );
+      return data;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
     }
   }
 );
@@ -52,7 +83,6 @@ const initialState = {
     error: null,
   },
   filter: '',
-  favoriteContacts: [],
 };
 
 const contactsSlice = createSlice({
@@ -62,20 +92,6 @@ const contactsSlice = createSlice({
     filterContacts(state, { payload }) {
       state.filter = payload;
     },
-    // addContact(state, { payload }) {
-    //   state.contacts = [...state.contacts, payload];
-    // },
-    // deleteContact(state, { payload }) {
-    //   state.contacts = state.contacts.filter(contact => contact.id !== payload);
-    // },
-    // addToFavorite(state, { payload }) {
-    //   state.favoriteContacts = [...state.favoriteContacts, payload];
-    // },
-    // removeFromFavorite(state, { payload }) {
-    //   state.favoriteContacts = state.favoriteContacts.filter(
-    //     contact => contact.id !== payload
-    //   );
-    // },
   },
   extraReducers: builder =>
     builder
@@ -87,28 +103,34 @@ const contactsSlice = createSlice({
         state.contacts.isLoading = false;
         state.contacts.items = [...state.contacts.items, payload];
       })
-      .addCase(removeContact.fulfilled, (state, { payload }) => {
+      .addCase(deleteContact.fulfilled, (state, { payload }) => {
         state.contacts.isLoading = false;
         state.contacts.items = state.contacts.items.filter(
-          contact => contact.id !== payload
+          contact => contact.id !== payload.id
         );
       })
-      .addMatcher(
-        isAnyOf(
-          fetchAllContacts.pending,
-          addContact.pending,
-          removeContact.pending
-        ),
-        state => {
-          state.contacts.isLoading = true;
-          state.contacts.error = null;
-        }
-      )
+      // praca z favorite
+      .addCase(addToFavorite.fulfilled, (state, { payload }) => {
+        state.contacts.items = state.contacts.items.map(contact =>
+          contact.id === payload.id ? { ...contact, favorite: true } : contact
+        );
+      })
+      .addCase(removeFromFavorite.fulfilled, (state, { payload }) => {
+        state.contacts.items = state.contacts.items.map(contact =>
+          contact.id === payload.id ? { ...contact, favorite: false } : contact
+        );
+      })
+      .addMatcher(isAnyOf(fetchAllContacts.pending), state => {
+        state.contacts.isLoading = true;
+        state.contacts.error = null;
+      })
       .addMatcher(
         isAnyOf(
           fetchAllContacts.rejected,
           addContact.rejected,
-          removeContact.rejected
+          deleteContact.rejected,
+          addToFavorite.rejected,
+          removeFromFavorite.rejected
         ),
         (state, { payload }) => {
           state.contacts.isLoading = false;
@@ -117,12 +139,6 @@ const contactsSlice = createSlice({
       ),
 });
 
-export const {
-  // addContact,
-  // deleteContact,
-  filterContacts,
-  // addToFavorite,
-  // removeFromFavorite,
-} = contactsSlice.actions;
+export const { filterContacts } = contactsSlice.actions;
 
 export const contactsReducer = contactsSlice.reducer;

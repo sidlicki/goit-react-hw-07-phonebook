@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
 import css from './ContactForm.module.css';
 import { nanoid } from 'nanoid';
-import { addContact } from 'redux/contacts/contacts.reducer';
 import { Notify } from 'notiflix';
+import { addContact } from 'redux/contacts/contacts.reducer';
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contactsStore.contacts);
+  const contacts = useSelector(state => state.contacts.contacts.items);
 
   const submitAddContact = evt => {
     evt.preventDefault();

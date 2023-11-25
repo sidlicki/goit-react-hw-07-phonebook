@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import css from './ContactList.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addToFavorite,
   deleteContact,
+  fetchAllContacts,
   removeFromFavorite,
 } from 'redux/contacts/contacts.reducer';
 import { Notify } from 'notiflix';
@@ -11,11 +12,13 @@ import { Notify } from 'notiflix';
 export const ContactList = () => {
   const dispatch = useDispatch();
 
-  const contacts = useSelector(state => state.contactsStore.contacts);
+  useEffect(() => {
+    dispatch(fetchAllContacts());
+  }, [dispatch]);
 
-  const filter = useSelector(state => state.contactsStore.filter);
+  const contacts = useSelector(state => state.contacts.contacts.items);
 
-  const favorites = useSelector(state => state.contactsStore.favoriteContacts);
+  const filter = useSelector(state => state.contacts.filter);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(filter.toLowerCase())
@@ -32,7 +35,7 @@ export const ContactList = () => {
   };
 
   const handleAddFavorite = contact => {
-    dispatch(addToFavorite(contact));
+    dispatch(addToFavorite(contact.id));
     Notify.success(`Contact "${contact.name}" added to favorites`);
   };
 
@@ -42,7 +45,8 @@ export const ContactList = () => {
   };
 
   const favOrNo = id => {
-    return favorites.some(contact => contact.id === id);
+    const contact = contacts.find(contact => contact.id === id);
+    return contact && contact.favorite === true;
   };
 
   return (
