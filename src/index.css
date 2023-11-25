@@ -19,21 +19,7 @@ code {
     monospace;
 }
 
-html {
-  overflow-y: scroll;
-}
-
 /* Додаткові стилі для кращого вигляду скролбара */
 ::-webkit-scrollbar {
-  width: 10px;
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #888;
-  border-radius: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
+  display: none;
 }
