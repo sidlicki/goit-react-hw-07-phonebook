@@ -7,16 +7,31 @@ import {
   removeFromFavorite,
 } from 'redux/contacts/contacts.reducer';
 import { Notify } from 'notiflix';
+import Loader from 'components/Loader/Loader';
+import {
+  selectorContacts,
+  selectorFilter,
+  selectorIsLoading,
+} from 'redux/contacts/contacts.selectors';
+import { openModal } from 'redux/modal/modal.reducer';
+import { Modal } from 'components/ModalEdit/ModalEdit';
+import { selectIsOpenModal } from 'redux/modal/modal.selectors';
 
 export const ContactList = () => {
   const dispatch = useDispatch();
 
-  const contacts = useSelector(state => state.contacts.contacts.items);
+  const contacts = useSelector(selectorContacts);
 
-  const filter = useSelector(state => state.contacts.filter);
+  const filter = useSelector(selectorFilter);
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter.toLowerCase())
+  const isLoading = useSelector(selectorIsLoading);
+
+  const isOpenModal = useSelector(selectIsOpenModal);
+
+  const filteredContacts = contacts.filter(
+    contact =>
+      contact.name.trim().toLowerCase().includes(filter.toLowerCase().trim()) ||
+      contact.number.trim().toString().includes(filter.toLowerCase().trim())
   );
 
   const filteredAndSortedContacts = [...filteredContacts].sort((a, b) =>
@@ -46,6 +61,11 @@ export const ContactList = () => {
 
   return (
     <ul className={css.list}>
+      {isLoading && (
+        <div className={css.loaderWrapper}>
+          <Loader />
+        </div>
+      )}
       {filteredAndSortedContacts.length > 0 ? (
         filteredAndSortedContacts.map(contact => (
           <li key={contact.id} className={css.item}>
@@ -66,13 +86,22 @@ export const ContactList = () => {
                 🤍
               </button>
             )}
-
+            {/* button edit */}
+            <button
+              className={css.button}
+              title={`Edit this conatct`}
+              onClick={() => dispatch(openModal(contact))}
+            >
+              🖊
+            </button>
+            {/*  */}
             <a className={css.link} href={`tel:${contact.number}`}>
               <span>
                 <b>{contact.name}</b>:
               </span>
-              <span>{contact.number}:</span>
+              <span> {contact.number}</span>
             </a>
+
             <button
               className={`${css.button} ${css.buttonDelete}`}
               onClick={() => handleDeleteContact(contact.name, contact.id)}
@@ -85,6 +114,7 @@ export const ContactList = () => {
       ) : (
         <h3 className={css.subtitle}>No contacts found.</h3>
       )}
+      {isOpenModal && <Modal />}
     </ul>
   );
 };

@@ -76,6 +76,24 @@ export const removeFromFavorite = createAsyncThunk(
   }
 );
 
+export const editContact = createAsyncThunk(
+  'contacts/editContact',
+  async (newContactInfo, thunkApi) => {
+    try {
+      const { data } = await axios.put(
+        `https://6560d78d83aba11d99d199f6.mockapi.io/contacts/allContacts/${newContactInfo.id}`,
+        {
+          name: newContactInfo.name,
+          number: newContactInfo.number,
+        }
+      );
+      return data;
+    } catch (error) {
+      return thunkApi.rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   contacts: {
     items: [],
@@ -120,17 +138,33 @@ const contactsSlice = createSlice({
           contact.id === payload.id ? { ...contact, favorite: false } : contact
         );
       })
-      .addMatcher(isAnyOf(fetchAllContacts.pending), state => {
-        state.contacts.isLoading = true;
-        state.contacts.error = null;
+      .addCase(editContact.fulfilled, (state, { payload }) => {
+        console.log(payload);
+        state.contacts.items = state.contacts.items.map(contact =>
+          contact.id === payload.id
+            ? { ...contact, name: payload.name, number: payload.number }
+            : contact
+        );
       })
+      .addMatcher(
+        isAnyOf(
+          fetchAllContacts.pending,
+          addContact.pending,
+          deleteContact.pending
+        ),
+        state => {
+          state.contacts.isLoading = true;
+          state.contacts.error = null;
+        }
+      )
       .addMatcher(
         isAnyOf(
           fetchAllContacts.rejected,
           addContact.rejected,
           deleteContact.rejected,
           addToFavorite.rejected,
-          removeFromFavorite.rejected
+          removeFromFavorite.rejected,
+          editContact.rejected
         ),
         (state, { payload }) => {
           state.contacts.isLoading = false;

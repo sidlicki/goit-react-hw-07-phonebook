@@ -4,10 +4,11 @@ import { nanoid } from 'nanoid';
 import { Notify } from 'notiflix';
 import { addContact } from 'redux/contacts/contacts.reducer';
 import { useState } from 'react';
+import { selectorContacts } from 'redux/contacts/contacts.selectors';
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.contacts.items);
+  const contacts = useSelector(selectorContacts);
 
   // робота з чекбоксом який додає до улюбленого відразу
   const [isFavorite, setIsFavorite] = useState(false);
@@ -45,16 +46,15 @@ export const ContactForm = () => {
     };
     try {
       dispatch(addContact(newContact));
-
-      // скидання форми пsckz додавання контакту
       name.value = '';
       number.value = '';
       setIsFavorite(false);
-      Notify.success(`Contact "${newContact.name}"  added successfully`);
     } catch (e) {
       Notify.error(
         `Contact "${newContact.name}" not added.  Error: ${e.message}`
       );
+    } finally {
+      Notify.success(`Contact "${newContact.name}"  added successfully`);
     }
   };
   return (
@@ -65,8 +65,8 @@ export const ContactForm = () => {
         name="name"
         placeholder="Enter name"
         required
-        pattern="^[A-Za-zА-Яа-яЇїІі\s]+$"
-        title="You can enter only letters of the Latin and Cyrillic alphabets, as well as spaces."
+        pattern="^[A-Za-zА-Яа-яЇїІі\d\s]+$"
+        title="You can enter letters of the Latin and Cyrillic alphabets, numbers, and spaces."
       />
       <input
         className={css.input}
@@ -74,8 +74,8 @@ export const ContactForm = () => {
         name="number"
         placeholder="Enter number"
         required
-        pattern="^(\+?\d+){5,12}$"
-        title="Phone number must start with '+' (optional) and contain only digits. Length: 5-12 characters."
+        pattern="^[\d+\s\-*#]{5,12}$"
+        title="Phone number can contain digits, spaces, hyphens, or symbols like *, #, etc. Length: 5-12 characters."
       />
       <label className={css.labelCheckbox} title={`Add to favorite`}>
         <input

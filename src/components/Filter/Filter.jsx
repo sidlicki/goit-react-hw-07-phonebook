@@ -9,7 +9,7 @@ export const Filter = () => {
     <input
       className={css.input}
       type="text"
-      placeholder="Search by name"
+      placeholder="Search..."
       onChange={evt => dispatch(filterContacts(evt.target.value))}
     />
   );
